@@ -23,6 +23,7 @@ func main() {
 
 	for _, container := range containers {
 		fmt.Println(container.ID)
-		fmt.Println(container.NetworkSettings)
+		fmt.Println(container.Names)
+		fmt.Println(container.NetworkSettings.Networks["bridge"].IPAddress)
 	}
 }
