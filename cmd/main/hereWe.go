@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
@@ -15,7 +16,6 @@ func main() {
 		panic(err)
 	}
 	defer p.Close()
-
 
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
@@ -29,23 +29,26 @@ func main() {
 		panic(err)
 	}
 
-	for _, container := range containers {
-		fmt.Println(container.ID)
-		fmt.Println(container.Names)
-		fmt.Println(container.NetworkSettings.Networks["bridge"].IPAddress)
-	}
-
 	for {
-		buf := make([]byte, 512)
-		n, addr, err := p.ReadFrom(buf)
+		buf := make([]byte, 1024)
+		_, addr, err := p.ReadFrom(buf)
+
 		if err != nil {
 			fmt.Printf("Connection error [%s]: %s\n", addr.String(), err)
 			continue
 		}
 
-		fmt.Println(n)
-		fmt.Println(addr)
-	}
+		query := []byte(buf)
+		p.WriteTo(query, addr)
 
+		for _, container := range containers {
+
+			
+			// fmt.Println(container.ID)
+			fmt.Println(container.Names[0])
+			// fmt.Println(container.NetworkSettings.Networks["bridge"].IPAddress)
+		}
+
+	}
 
 }
